@@ -5,20 +5,17 @@ import (
 	"github.com/go-vgo/robotgo"
 	"github.com/vcaesar/gcv"
 	"image"
-	"time"
 )
 
+// Соответсвие при поиске изображения
+const ImgSearchRate = 0.9
+
 type Screen struct {
-	bounds image.Rectangle
-	opts   ScreenOpts
+	bounds *image.Rectangle
 }
 
-type ScreenOpts struct {
-	CaptureDelay time.Duration
-}
-
-func NewScreen(bounds image.Rectangle, opts ScreenOpts) *Screen {
-	return &Screen{bounds: bounds, opts: opts}
+func NewScreen(bounds image.Rectangle) *Screen {
+	return &Screen{bounds: &bounds}
 }
 
 func (s *Screen) GetMousePos() (int, int) {
@@ -28,18 +25,30 @@ func (s *Screen) GetMousePos() (int, int) {
 }
 
 func (s *Screen) CaptureScreen() image.Image {
-	time.Sleep(s.opts.CaptureDelay * time.Millisecond)
+	// если не передали в NewScreen делаем скрин всего экрана
+	if s == nil {
+		sx, sy := robotgo.GetScreenSize()
+		bit := robotgo.CaptureScreen(0, 0, sx, sy)
+		defer robotgo.FreeBitmap(bit)
+		img := robotgo.ToImage(bit)
+		return img
+	}
 	bit := robotgo.CaptureScreen(s.bounds.Min.X, s.bounds.Min.Y, s.bounds.Max.X, s.bounds.Max.Y)
 	defer robotgo.FreeBitmap(bit)
 	img := robotgo.ToImage(bit)
 	return img
 }
 
-func (s *Screen) ImageOnScreen(subImg image.Image) bool {
-	time.Sleep(s.opts.CaptureDelay * time.Millisecond)
-	bit := robotgo.CaptureScreen(s.bounds.Min.X, s.bounds.Min.Y, s.bounds.Max.X, s.bounds.Max.Y)
-	defer robotgo.FreeBitmap(bit)
-	img := robotgo.ToImage(bit)
-	gcv.FindImg(subImg, img)
-	return true
+func (s *Screen) FindOnScreen(path string) (*image.Point, error) {
+	subImg, _, err := robotgo.DecodeImg(path)
+	//imgSub, err:=imgo.ReadPNG("F:\\projects\\go\\screen_bot\\static\\l2\\login.PNG")
+	if err != nil {
+		return nil, fmt.Errorf("img decode err:%w", err)
+	}
+	screen := s.CaptureScreen()
+	_, rate, _, point := gcv.FindImg(subImg, screen)
+	if rate < ImgSearchRate {
+		return nil, nil
+	}
+	return &point, nil
 }

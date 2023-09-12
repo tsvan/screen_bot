@@ -2,7 +2,7 @@ package base
 
 import (
 	"clicker_bot/internal"
-	"clicker_bot/script/base/task"
+	"clicker_bot/task/base/task"
 	"context"
 	"fmt"
 	"image"
@@ -26,20 +26,17 @@ func (d *DummyMainTask) Exec(ctx context.Context, opts internal.TaskOpts) (inter
 }
 
 func (d *DummyMainTask) InitScrAct() []internal.TaskWithOpts {
-	screen := internal.NewScreen(image.Rectangle{
-		Min: image.Point{X: 1, Y: 1},
-		Max: image.Point{X: 100, Y: 100},
-	}, internal.ScreenOpts{CaptureDelay: 100})
+	screen := internal.NewScreen(image.Rectangle{Min: image.Point{X: 1, Y: 1}, Max: image.Point{X: 100, Y: 100}})
 
 	dummy1 := internal.TaskWithOpts{
-		Task: task.NewDummyTask(screen, internal.InProgress),
+		Task: task.NewDummyTask(screen),
 		Opts: internal.TaskOpts{
 			Name: "dummy1",
 		},
 	}
 
 	dummy2 := internal.TaskWithOpts{
-		Task: task.NewDummyTask(screen, internal.InProgress),
+		Task: task.NewDummyTask(screen),
 		Opts: internal.TaskOpts{
 			DelayBefore: 200,
 			DelayAfter:  300,

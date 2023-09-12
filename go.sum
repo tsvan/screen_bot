@@ -39,6 +39,8 @@ github.com/tklauser/go-sysconf v0.3.10 h1:IJ1AZGZRWbY8T5Vfk04D9WOA5WSejdflXxP03O
 github.com/tklauser/go-sysconf v0.3.10/go.mod h1:C8XykCvCb+Gn0oNCWPIlcb0RuglQTYaQ2hGm7jmxEFk=
 github.com/tklauser/numcpus v0.4.0 h1:E53Dm1HjH1/R2/aoCtXtPgzmElmn51aOkhCFSuZq//o=
 github.com/tklauser/numcpus v0.4.0/go.mod h1:1+UI3pD8NW14VMwdgJNJ1ESk2UnwhAnz5hMwiKKqXCQ=
+github.com/vcaesar/bitmap v0.10.0-beta3.2 h1:XKSSicV4rraY1YolmTSqxH9yHBNWpk73cyaqULNAsj4=
+github.com/vcaesar/bitmap v0.10.0-beta3.2/go.mod h1:n1hbWdhPn/+yL4AZlG8ZHogR6pOEIomyr5f0wfLdiB8=
 github.com/vcaesar/gcv v0.40.5 h1:e78JPDfFA+B3Yq2GE9vrAMWH9O2vIOew7ZD4PHW8uvE=
 github.com/vcaesar/gcv v0.40.5/go.mod h1:heJDjlXfAJJycQfsHMNqJefLCEP9IY+CHvFLfR9otUU=
 github.com/vcaesar/gops v0.23.0 h1:gY/E5UJfLpImJjE7tiTJIVRcKOWxi7YX1J/CUHK8gXk=

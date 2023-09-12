@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/go-vgo/robotgo v1.0.0-beta5.3
 	github.com/robotn/gohook v0.31.3
+	github.com/vcaesar/bitmap v0.10.0-beta3.2
 	github.com/vcaesar/gcv v0.40.5
 	golang.org/x/sync v0.3.0
 )

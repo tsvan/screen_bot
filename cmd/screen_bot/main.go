@@ -2,7 +2,7 @@ package main
 
 import (
 	"clicker_bot/internal"
-	"clicker_bot/script/base"
+	"clicker_bot/task/l2/login"
 	"context"
 	"fmt"
 	hook "github.com/robotn/gohook"
@@ -13,8 +13,8 @@ func main() {
 	defer cancelFunc()
 
 	var exit = make(chan bool)
-	dummy := base.NewDummyMainTask()
-	startBot(ctx, dummy)
+	task := login.NewLoginTask()
+	startBot(ctx, task)
 
 	go closeHandler(exit, "q")
 	<-exit
@@ -25,7 +25,7 @@ func main() {
 
 func startBot(ctx context.Context, script internal.Task) {
 	go func() {
-		_, err := script.Exec(ctx, internal.TaskOpts{})
+		err := script.Exec(ctx, internal.TaskOpts{})
 		if err != nil {
 			fmt.Println(err)
 		}

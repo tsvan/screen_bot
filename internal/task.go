@@ -25,5 +25,5 @@ type TaskWithOpts struct {
 }
 
 type Task interface {
-	Exec(ctx context.Context, opts TaskOpts) (Status, error)
+	Exec(ctx context.Context, opts TaskOpts) error
 }
