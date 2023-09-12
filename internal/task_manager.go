@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"golang.org/x/sync/errgroup"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type RunOpt string
@@ -17,16 +18,16 @@ const (
 	RunOptSequenceStatus RunOpt = "SequenceStatus"
 )
 
-type ScreenActionManager struct {
-	screenActions []ScreenActionWithOpts
+type TaskManager struct {
+	tasks []TaskWithOpts
 }
 
-func NewScreenActionManager(screenActions []ScreenActionWithOpts) *ScreenActionManager {
-	return &ScreenActionManager{screenActions: screenActions}
+func NewTaskManager(tasks []TaskWithOpts) *TaskManager {
+	return &TaskManager{tasks: tasks}
 }
 
-func (s *ScreenActionManager) Run(ctx context.Context, runOpt RunOpt) error {
-	if len(s.screenActions) == 0 {
+func (s *TaskManager) Run(ctx context.Context, runOpt RunOpt) error {
+	if len(s.tasks) == 0 {
 		return errors.New("no screen actions to run")
 	}
 	switch runOpt {
@@ -44,10 +45,10 @@ func (s *ScreenActionManager) Run(ctx context.Context, runOpt RunOpt) error {
 	return nil
 }
 
-func (s *ScreenActionManager) runSequence(ctx context.Context) error {
-	for _, v := range s.screenActions {
+func (s *TaskManager) runSequence(ctx context.Context) error {
+	for _, v := range s.tasks {
 		time.Sleep(v.Opts.DelayBefore * time.Millisecond)
-		_, err := v.ScreenAction.Handle(ctx, v.Opts)
+		_, err := v.Task.Exec(ctx, v.Opts)
 		if err != nil {
 			return fmt.Errorf("screen action run err: %w", err)
 		}
@@ -57,11 +58,11 @@ func (s *ScreenActionManager) runSequence(ctx context.Context) error {
 	return nil
 }
 
-func (s *ScreenActionManager) runParallel(ctx context.Context) error {
+func (s *TaskManager) runParallel(ctx context.Context) error {
 	errs, ctx := errgroup.WithContext(ctx)
-	for _, v := range s.screenActions {
+	for _, v := range s.tasks {
 		errs.Go(func() error {
-			_, err := v.ScreenAction.Handle(ctx, v.Opts)
+			_, err := v.Task.Exec(ctx, v.Opts)
 			if err != nil {
 				return fmt.Errorf("screen action run err: %w", err)
 			}
@@ -72,7 +73,7 @@ func (s *ScreenActionManager) runParallel(ctx context.Context) error {
 	return errs.Wait()
 }
 
-func (s *ScreenActionManager) runLoop(ctx context.Context) error {
+func (s *TaskManager) runLoop(ctx context.Context) error {
 	for {
 		select {
 		// проверяем не завершён ли ещё контекст и выходим, если завершён
@@ -82,9 +83,9 @@ func (s *ScreenActionManager) runLoop(ctx context.Context) error {
 
 		}
 
-		for _, v := range s.screenActions {
+		for _, v := range s.tasks {
 			time.Sleep(v.Opts.DelayBefore * time.Millisecond)
-			_, err := v.ScreenAction.Handle(ctx, v.Opts)
+			_, err := v.Task.Exec(ctx, v.Opts)
 			if err != nil {
 				return fmt.Errorf("screen action run err: %w", err)
 			}
@@ -94,7 +95,7 @@ func (s *ScreenActionManager) runLoop(ctx context.Context) error {
 	}
 }
 
-func (s *ScreenActionManager) runStatus(ctx context.Context) error {
+func (s *TaskManager) runStatus(ctx context.Context) error {
 	for {
 		select {
 		// проверяем не завершён ли ещё контекст и выходим, если завершён
@@ -103,9 +104,9 @@ func (s *ScreenActionManager) runStatus(ctx context.Context) error {
 		default:
 
 		}
-		for _, v := range s.screenActions {
+		for _, v := range s.tasks {
 			time.Sleep(v.Opts.DelayBefore * time.Millisecond)
-			status, err := v.ScreenAction.Handle(ctx, v.Opts)
+			status, err := v.Task.Exec(ctx, v.Opts)
 			if err != nil {
 				return fmt.Errorf("screen action run err: %w", err)
 			}

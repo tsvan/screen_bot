@@ -13,30 +13,29 @@ func main() {
 	defer cancelFunc()
 
 	var exit = make(chan bool)
-	dummyScript := base.NewDummyScript()
-	startBot(ctx, dummyScript)
+	dummy := base.NewDummyMainTask()
+	startBot(ctx, dummy)
 
-	go closeHandler(dummyScript, exit, "q")
+	go closeHandler(exit, "q")
 	<-exit
 	go func() {
 		<-ctx.Done()
 	}()
 }
 
-func startBot(ctx context.Context, script internal.Script) {
+func startBot(ctx context.Context, script internal.Task) {
 	go func() {
-		err := script.Start(ctx)
+		_, err := script.Exec(ctx, internal.TaskOpts{})
 		if err != nil {
 			fmt.Println(err)
 		}
 	}()
 }
 
-func closeHandler(script internal.Script, exit chan bool, closeKey string) {
+func closeHandler(exit chan bool, closeKey string) {
 	fmt.Println(fmt.Sprintf("--- Please press %s to exit---", closeKey))
 
 	hook.Register(hook.KeyDown, []string{closeKey}, func(e hook.Event) {
-		script.Stop()
 		exit <- true
 	})
 
