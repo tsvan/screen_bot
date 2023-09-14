@@ -3,9 +3,10 @@ module clicker_bot
 go 1.18
 
 require (
+	github.com/alitto/pond v1.8.3
 	github.com/go-vgo/robotgo v1.0.0-beta5.3
 	github.com/robotn/gohook v0.31.3
-	github.com/vcaesar/bitmap v0.10.0-beta3.2
+	github.com/shirou/gopsutil/v3 v3.22.4
 	github.com/vcaesar/gcv v0.40.5
 	golang.org/x/sync v0.3.0
 )
@@ -19,7 +20,6 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/robotn/xgb v0.0.0-20190912153532-2cb92d044934 // indirect
 	github.com/robotn/xgbutil v0.0.0-20190912154524-c861d6f87770 // indirect
-	github.com/shirou/gopsutil/v3 v3.22.4 // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/vcaesar/gops v0.23.0 // indirect

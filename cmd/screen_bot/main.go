@@ -5,6 +5,7 @@ import (
 	"clicker_bot/task/l2/login"
 	"context"
 	"fmt"
+	"github.com/alitto/pond"
 	hook "github.com/robotn/gohook"
 )
 
@@ -13,7 +14,9 @@ func main() {
 	defer cancelFunc()
 
 	var exit = make(chan bool)
-	task := login.NewLoginTask()
+	pool := pond.New(1, 10)
+	actionPool := internal.NewAction(pool, nil)
+	task := login.NewLoginTask(actionPool)
 	startBot(ctx, task)
 
 	go closeHandler(exit, "q")

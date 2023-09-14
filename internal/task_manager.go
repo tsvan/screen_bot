@@ -44,11 +44,18 @@ func (s *TaskManager) Run(ctx context.Context, runOpt RunOpt) error {
 }
 
 func (s *TaskManager) runSequence(ctx context.Context) error {
+START:
 	for _, v := range s.tasks {
 		time.Sleep(v.Opts.DelayBefore * time.Millisecond)
 		err := v.Task.Exec(ctx, v.Opts)
 		if err != nil {
-			return fmt.Errorf("task run err: %w", err)
+			switch err.(type) {
+			default:
+				return fmt.Errorf("task run err: %w", err)
+			case *TaskErr:
+				fmt.Println(fmt.Sprintf("%s from %s", err, v.Opts.Name))
+				goto START
+			}
 		}
 		time.Sleep(v.Opts.DelayAfter * time.Millisecond)
 	}

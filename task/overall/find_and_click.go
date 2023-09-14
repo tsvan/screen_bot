@@ -4,22 +4,24 @@ import (
 	"clicker_bot/internal"
 	"context"
 	"fmt"
-	"github.com/go-vgo/robotgo"
 	"image"
 	"time"
 )
 
 type FindAndClickTask struct {
 	Screen      *internal.Screen
+	action      *internal.Action
 	Path        string
 	PointOffset image.Point
+	Attempts    int
 }
 
-func NewFindAndClickTask(screen *internal.Screen, path string, pointOffset image.Point) *FindAndClickTask {
-	return &FindAndClickTask{Screen: screen, Path: path, PointOffset: pointOffset}
+func NewFindAndClickTask(action *internal.Action, screen *internal.Screen, path string, pointOffset image.Point, attempts int) *FindAndClickTask {
+	return &FindAndClickTask{action: action, Screen: screen, Path: path, PointOffset: pointOffset, Attempts: attempts}
 }
 
 func (f *FindAndClickTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
+	i := 0
 	for {
 		select {
 		// проверяем не завершён ли ещё контекст и выходим, если завершён
@@ -28,6 +30,12 @@ func (f *FindAndClickTask) Exec(ctx context.Context, opts internal.TaskOpts) err
 		default:
 
 		}
+
+		// считаем количество попыток
+		if i > f.Attempts {
+			return &internal.TaskErr{StatusCode: internal.AttemptsEnd}
+		}
+		i++
 
 		time.Sleep(opts.DelayBefore * time.Millisecond)
 		point, err := f.Screen.FindOnScreen(f.Path)
@@ -38,7 +46,7 @@ func (f *FindAndClickTask) Exec(ctx context.Context, opts internal.TaskOpts) err
 			continue
 		}
 
-		robotgo.MoveClick(point.X+10, point.Y+10)
+		f.action.Click(point.X+f.PointOffset.X, point.Y+f.PointOffset.Y, true)
 
 		time.Sleep(opts.DelayAfter * time.Millisecond)
 		return nil
