@@ -22,3 +22,9 @@ func (a *Action) Click(x, y int, double bool) {
 		robotgo.MoveClick(x, y, "left", double)
 	})
 }
+
+func (a *Action) Move(x, y int) {
+	a.actionPool.Submit(func() {
+		robotgo.Move(x, y)
+	})
+}

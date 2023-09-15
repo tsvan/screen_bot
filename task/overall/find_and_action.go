@@ -8,19 +8,23 @@ import (
 	"time"
 )
 
-type FindAndClickTask struct {
+type FindAndActionTask struct {
+	imgToFindPath string
+	Opts          FindAndActionTaskOpts
+}
+
+type FindAndActionTaskOpts struct {
 	Screen      *internal.Screen
-	action      *internal.Action
-	Path        string
+	ActionFunc  func(x, y int)
 	PointOffset image.Point
 	Attempts    int
 }
 
-func NewFindAndClickTask(action *internal.Action, screen *internal.Screen, path string, pointOffset image.Point, attempts int) *FindAndClickTask {
-	return &FindAndClickTask{action: action, Screen: screen, Path: path, PointOffset: pointOffset, Attempts: attempts}
+func NewFindAndActionTask(imgToFindPath string, opts FindAndActionTaskOpts) *FindAndActionTask {
+	return &FindAndActionTask{imgToFindPath: imgToFindPath, Opts: opts}
 }
 
-func (f *FindAndClickTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
+func (f *FindAndActionTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 	i := 0
 	for {
 		select {
@@ -32,21 +36,20 @@ func (f *FindAndClickTask) Exec(ctx context.Context, opts internal.TaskOpts) err
 		}
 
 		// считаем количество попыток
-		if i > f.Attempts {
+		if i > f.Opts.Attempts {
 			return &internal.TaskErr{StatusCode: internal.AttemptsEnd}
 		}
 		i++
 
 		time.Sleep(opts.DelayBefore * time.Millisecond)
-		point, err := f.Screen.FindOnScreen(f.Path)
+		point, err := f.Opts.Screen.FindOnScreen(f.imgToFindPath)
 		if err != nil {
 			return fmt.Errorf("find img err:%w", err)
 		}
 		if point == nil {
 			continue
 		}
-
-		f.action.Click(point.X+f.PointOffset.X, point.Y+f.PointOffset.Y, true)
+		f.Opts.ActionFunc(point.X, point.Y)
 
 		time.Sleep(opts.DelayAfter * time.Millisecond)
 		return nil
