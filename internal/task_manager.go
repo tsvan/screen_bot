@@ -88,11 +88,25 @@ func (s *TaskManager) runLoop(ctx context.Context) error {
 
 		}
 
+	START:
+		// Для запуска части задач один раз
+		firstTime := true
 		for _, v := range s.tasks {
+			if v.Opts.RunOnce && !firstTime {
+				continue
+			}
+			firstTime = false
+
 			time.Sleep(v.Opts.DelayBefore * time.Millisecond)
 			err := v.Task.Exec(ctx, v.Opts)
 			if err != nil {
-				return fmt.Errorf("task run err: %w", err)
+				switch err.(type) {
+				default:
+					return fmt.Errorf("task run err: %w", err)
+				case *TaskErr:
+					fmt.Println(fmt.Sprintf("%s from %s", err, v.Opts.Name))
+					goto START
+				}
 			}
 			time.Sleep(v.Opts.DelayAfter * time.Millisecond)
 		}

@@ -2,7 +2,7 @@ package main
 
 import (
 	"clicker_bot/internal"
-	"clicker_bot/task/l2/login"
+	"clicker_bot/task/l2/manor"
 	"context"
 	"fmt"
 	"github.com/alitto/pond"
@@ -16,7 +16,7 @@ func main() {
 	var exit = make(chan bool)
 	pool := pond.New(1, 10)
 	actionPool := internal.NewAction(pool, nil)
-	task := login.NewLoginTask(actionPool)
+	task := manor.NewManorTask(actionPool)
 	startBot(ctx, task)
 
 	go closeHandler(exit, "q")
@@ -28,7 +28,7 @@ func main() {
 
 func startBot(ctx context.Context, script internal.Task) {
 	go func() {
-		err := script.Exec(ctx, internal.TaskOpts{})
+		err := script.Exec(ctx, internal.TaskOpts{DelayBefore: 5000})
 		if err != nil {
 			fmt.Println(err)
 		}

@@ -13,3 +13,10 @@ https://gocv.io/getting-started/windows/
 `pkg\mod\gocv.io\x` поместить её в `%GOPATH%\src\gocv.io\x` и переименовать в `gocv`
 
 `go env GOPATH` что бы узнать GOPATH
+
+### tesseract-ocr
+Простая установка
+https://github.com/tesseract-ocr/tessdoc
+Столкнулся с проблемой
+https://github.com/otiai10/gosseract/issues/223
+Приходится запускать через cmd. Возможно сборка из исходников решит проблему.
