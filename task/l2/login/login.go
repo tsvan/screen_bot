@@ -8,15 +8,15 @@ import (
 	"image"
 )
 
-type LoginTask struct {
+type Task struct {
 	action *internal.Action
 }
 
-func NewLoginTask(action *internal.Action) *LoginTask {
-	return &LoginTask{action: action}
+func NewTask(action *internal.Action) *Task {
+	return &Task{action: action}
 }
 
-func (d *LoginTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
+func (d *Task) Exec(ctx context.Context, opts internal.TaskOpts) error {
 	manager := internal.NewTaskManager(d.Init())
 	err := manager.Run(ctx, internal.RunOptSequence)
 	if err != nil {
@@ -25,7 +25,7 @@ func (d *LoginTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 	return nil
 }
 
-func (d *LoginTask) Init() []internal.TaskWithOpts {
+func (d *Task) Init() []internal.TaskWithOpts {
 	l2Start := internal.TaskWithOpts{
 		Task: NewL2StartTask(),
 		Opts: internal.TaskOpts{Name: "l2 start", DelayAfter: 10000},
@@ -46,20 +46,20 @@ func (d *LoginTask) Init() []internal.TaskWithOpts {
 	}
 
 	l2Login1 := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("F:\\projects\\go\\screen_bot\\static\\l2\\login.PNG", loginTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\login.PNG", loginTaskOpts),
 		Opts: internal.TaskOpts{Name: "l2 login first screen", DelayBefore: 1000},
 	}
 	l2Login2 := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("F:\\projects\\go\\screen_bot\\static\\l2\\accept.PNG", loginTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\accept.PNG", loginTaskOpts),
 		Opts: internal.TaskOpts{Name: "l2 login second screen", DelayBefore: 1000},
 	}
 
 	l2Login3 := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("F:\\projects\\go\\screen_bot\\static\\l2\\enter.PNG", loginTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\enter.PNG", loginTaskOpts),
 		Opts: internal.TaskOpts{Name: "l2 login third screen", DelayBefore: 1000},
 	}
 	l2Login4 := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("F:\\projects\\go\\screen_bot\\static\\l2\\start.PNG", loginTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\start.PNG", loginTaskOpts),
 		Opts: internal.TaskOpts{Name: "l2 login fourth screen", DelayBefore: 1000},
 	}
 

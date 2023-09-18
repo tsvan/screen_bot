@@ -8,15 +8,15 @@ import (
 	"image"
 )
 
-type ManorTask struct {
+type Task struct {
 	action *internal.Action
 }
 
-func NewManorTask(action *internal.Action) *ManorTask {
-	return &ManorTask{action: action}
+func NewTask(action *internal.Action) *Task {
+	return &Task{action: action}
 }
 
-func (d *ManorTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
+func (d *Task) Exec(ctx context.Context, opts internal.TaskOpts) error {
 	manager := internal.NewTaskManager(d.Init())
 	err := manager.Run(ctx, internal.RunOptLoop)
 	if err != nil {
@@ -25,7 +25,7 @@ func (d *ManorTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 	return nil
 }
 
-func (d *ManorTask) Init() []internal.TaskWithOpts {
+func (d *Task) Init() []internal.TaskWithOpts {
 	//startl2 := internal.TaskWithOpts{
 	//	Task: login.NewLoginTask(d.action),
 	//	Opts: internal.TaskOpts{Name: "l2 login", DelayAfter: 10000, RunOnce: true},
@@ -56,12 +56,12 @@ func (d *ManorTask) Init() []internal.TaskWithOpts {
 	}
 
 	handOverManor := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("F:\\projects\\go\\screen_bot\\static\\l2\\handover_manor.PNG", ManorTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\handover_manor.PNG", ManorTaskOpts),
 		Opts: internal.TaskOpts{Name: "hand over manor", DelayBefore: 100},
 	}
 
 	captcha := internal.TaskWithOpts{
-		Task: NewCaptchaTaskTask("F:\\projects\\go\\screen_bot\\static\\l2\\check_manor.PNG", nil, d.action, 10),
+		Task: NewCaptchaTaskTask("\\static\\l2\\check_manor.PNG", nil, d.action, 10),
 		Opts: internal.TaskOpts{Name: "manor captcha", DelayBefore: 100},
 	}
 
@@ -74,23 +74,23 @@ func (d *ManorTask) Init() []internal.TaskWithOpts {
 	}
 
 	selectSeed := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("F:\\projects\\go\\screen_bot\\static\\l2\\seed.PNG", SelectSeedTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\seed.PNG", SelectSeedTaskOpts),
 		Opts: internal.TaskOpts{Name: "select seed type", DelayBefore: 100},
 	}
 
 	citySelect := internal.TaskWithOpts{
-		Task: NewSelectCityTask("F:\\projects\\go\\screen_bot\\static\\l2\\select_city.PNG", nil, d.action, 1, 3, 10),
+		Task: NewSelectCityTask("\\static\\l2\\select_city.PNG", nil, d.action, 1, 3, 10),
 		Opts: internal.TaskOpts{Name: "select city and seed count", DelayBefore: 100},
 	}
 
 	ManorTaskOpts.PointOffset = image.Point{X: 10, Y: 2}
 	confirmSeeds := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("F:\\projects\\go\\screen_bot\\static\\l2\\confirm_seed.PNG", ManorTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\confirm_seed.PNG", ManorTaskOpts),
 		Opts: internal.TaskOpts{Name: "confirm seed count and city", DelayBefore: 100},
 	}
 
 	sellSeeds := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("F:\\projects\\go\\screen_bot\\static\\l2\\sell_seed.PNG", ManorTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\sell_seed.PNG", ManorTaskOpts),
 		Opts: internal.TaskOpts{Name: "sell seeds", DelayBefore: 100},
 	}
 

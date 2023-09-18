@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const TmpImgPath = "F:\\projects\\go\\screen_bot\\static\\screens\\tmp.png"
+const TmpImgPath = "\\static\\screens\\tmp.png"
 
 type CaptchaTask struct {
 	imgToFindPath string

@@ -8,14 +8,10 @@ import (
 
 type Action struct {
 	actionPool *pond.WorkerPool
-	opts       *ActionOpts
 }
 
-type ActionOpts struct {
-}
-
-func NewAction(actionPool *pond.WorkerPool, opts *ActionOpts) *Action {
-	return &Action{actionPool: actionPool, opts: opts}
+func NewAction(actionPool *pond.WorkerPool) *Action {
+	return &Action{actionPool: actionPool}
 }
 
 func (a *Action) Click(x, y int, double bool) {

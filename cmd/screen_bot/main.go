@@ -15,8 +15,8 @@ func main() {
 
 	var exit = make(chan bool)
 	pool := pond.New(1, 10)
-	actionPool := internal.NewAction(pool, nil)
-	task := manor.NewManorTask(actionPool)
+	actionPool := internal.NewAction(pool)
+	task := manor.NewTask(actionPool)
 	startBot(ctx, task)
 
 	go closeHandler(exit, "q")

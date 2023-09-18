@@ -57,7 +57,6 @@ func (f *SelectCityTask) Exec(ctx context.Context, opts internal.TaskOpts) error
 		}
 
 		// вводим количество семян для сдачи
-		fmt.Println(f.SeedNumber)
 		f.action.KeyPress(strconv.Itoa(f.SeedNumber))
 		//Выбираем город
 		f.action.Click(point.X+20, point.Y+5, false)

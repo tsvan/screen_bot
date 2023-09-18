@@ -12,10 +12,9 @@ import (
 type RunOpt string
 
 const (
-	RunOptSequence       RunOpt = "Sequence"
-	RunOptParallel       RunOpt = "Parallel"
-	RunOptLoop           RunOpt = "Loop"
-	RunOptSequenceStatus RunOpt = "SequenceStatus"
+	RunOptSequence RunOpt = "Sequence"
+	RunOptParallel RunOpt = "Parallel"
+	RunOptLoop     RunOpt = "Loop"
 )
 
 type TaskManager struct {
@@ -69,7 +68,12 @@ func (s *TaskManager) runParallel(ctx context.Context) error {
 		errs.Go(func() error {
 			err := v.Task.Exec(ctx, v.Opts)
 			if err != nil {
-				return fmt.Errorf("task run err: %w", err)
+				switch err.(type) {
+				default:
+					return fmt.Errorf("task run err: %w", err)
+				case *TaskErr:
+					fmt.Println(fmt.Sprintf("%s from %s", err, v.Opts.Name))
+				}
 			}
 			return nil
 		})
