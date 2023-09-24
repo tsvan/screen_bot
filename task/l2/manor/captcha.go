@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"image"
 	"strconv"
 	"strings"
 	"time"
@@ -17,10 +18,11 @@ type CaptchaTask struct {
 	Screen        *internal.Screen
 	action        *internal.Action
 	Attempts      int
+	savedPoint    *image.Point
 }
 
 func NewCaptchaTaskTask(imgToFindPath string, screen *internal.Screen, action *internal.Action, attempts int) *CaptchaTask {
-	return &CaptchaTask{imgToFindPath: imgToFindPath, Screen: screen, Attempts: attempts}
+	return &CaptchaTask{imgToFindPath: imgToFindPath, Screen: screen, action: action, Attempts: attempts}
 }
 
 func (f *CaptchaTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
@@ -36,23 +38,38 @@ func (f *CaptchaTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 
 		// считаем количество попыток
 		if i > f.Attempts {
+			f.savedPoint = nil
 			return &internal.TaskErr{StatusCode: internal.AttemptsEnd}
 		}
 		i++
 
 		time.Sleep(opts.DelayBefore * time.Millisecond)
 
-		//находим область капчи
-		point, err := f.Screen.FindOnScreen(f.imgToFindPath)
-		if err != nil {
-			return fmt.Errorf("find img err:%w", err)
-		}
-		if point == nil {
-			continue
+		var clickPoint image.Point
+		if f.savedPoint == nil {
+			point, err := f.Screen.FindOnScreen(f.imgToFindPath)
+			if err != nil {
+				return fmt.Errorf("find img err:%w", err)
+			}
+			if point == nil {
+				continue
+			}
+			f.savedPoint = point
+			clickPoint = *point
+		} else {
+			checkPoint, err := f.Screen.FindOnScreen(f.imgToFindPath, f.savedPoint.X-150, f.savedPoint.Y-200, 320, 400)
+			if err != nil {
+				return fmt.Errorf("find img err:%w", err)
+			}
+			if checkPoint == nil {
+				continue
+			}
+			clickPoint.X = f.savedPoint.X - 150 + checkPoint.X
+			clickPoint.Y = f.savedPoint.Y - 200 + checkPoint.Y
 		}
 
 		//сохраняем скрин с капчей
-		err = f.Screen.SaveScreen(TmpImgPath, point.X, point.Y-50, 100, 50)
+		err := f.Screen.SaveScreen(TmpImgPath, clickPoint.X, clickPoint.Y-50, 100, 50)
 		if err != nil {
 			return fmt.Errorf("can't save captcha:%w", err)
 		}
@@ -69,7 +86,7 @@ func (f *CaptchaTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 
 		//после ввода капчи жмём подтверждение
 		time.Sleep(100 * time.Microsecond)
-		f.action.Click(point.X+10, point.Y+10, false)
+		f.action.Click(clickPoint.X+10, clickPoint.Y+10, false)
 
 		time.Sleep(opts.DelayAfter * time.Millisecond)
 		return nil

@@ -18,7 +18,7 @@ func NewTask(action *internal.Action) *Task {
 
 func (d *Task) Exec(ctx context.Context, opts internal.TaskOpts) error {
 	manager := internal.NewTaskManager(d.Init())
-	err := manager.Run(ctx, internal.RunOptSequence)
+	err := manager.Run(ctx, internal.RunOptSequence, 0)
 	if err != nil {
 		return fmt.Errorf("manager run err: %w", err)
 	}

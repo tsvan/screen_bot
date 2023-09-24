@@ -25,7 +25,7 @@ func NewTaskManager(tasks []TaskWithOpts) *TaskManager {
 	return &TaskManager{tasks: tasks}
 }
 
-func (s *TaskManager) Run(ctx context.Context, runOpt RunOpt) error {
+func (s *TaskManager) Run(ctx context.Context, runOpt RunOpt, reRunAttempts int) error {
 	if len(s.tasks) == 0 {
 		return errors.New("no tasks to run")
 	}
@@ -35,7 +35,7 @@ func (s *TaskManager) Run(ctx context.Context, runOpt RunOpt) error {
 	case RunOptParallel:
 		return s.runParallel(ctx)
 	case RunOptLoop:
-		return s.runLoop(ctx)
+		return s.runLoop(ctx, reRunAttempts)
 
 	}
 
@@ -72,7 +72,7 @@ func (s *TaskManager) runParallel(ctx context.Context) error {
 				default:
 					return fmt.Errorf("task run err: %w", err)
 				case *TaskErr:
-					fmt.Println(fmt.Sprintf("%s from %s", err, v.Opts.Name))
+					fmt.Println(fmt.Sprintf("opt: parallel, %s from %s", err, v.Opts.Name))
 				}
 			}
 			return nil
@@ -82,7 +82,11 @@ func (s *TaskManager) runParallel(ctx context.Context) error {
 	return errs.Wait()
 }
 
-func (s *TaskManager) runLoop(ctx context.Context) error {
+func (s *TaskManager) runLoop(ctx context.Context, reRunAttempts int) error {
+	// Для запуска части задач один раз
+	firstTime := true
+	failRunsCount := 0
+
 	for {
 		select {
 		// проверяем не завершён ли ещё контекст и выходим, если завершён
@@ -93,8 +97,12 @@ func (s *TaskManager) runLoop(ctx context.Context) error {
 		}
 
 	START:
-		// Для запуска части задач один раз
-		firstTime := true
+		// для полного перезапуска, например если игра не отвечает
+		if failRunsCount > reRunAttempts {
+			fmt.Println("rerun attempts")
+			firstTime = true
+		}
+
 		for _, v := range s.tasks {
 			if v.Opts.RunOnce && !firstTime {
 				continue
@@ -108,12 +116,16 @@ func (s *TaskManager) runLoop(ctx context.Context) error {
 				default:
 					return fmt.Errorf("task run err: %w", err)
 				case *TaskErr:
-					fmt.Println(fmt.Sprintf("%s from %s", err, v.Opts.Name))
+					fmt.Println(fmt.Sprintf("opt: loop, %s from %s", err, v.Opts.Name))
+					failRunsCount++
 					goto START
 				}
 			}
 			time.Sleep(v.Opts.DelayAfter * time.Millisecond)
 		}
+
+		// сбрасываем счётчик неуспешных циклов при полном прохождении всех задач
+		failRunsCount = 0
 
 	}
 }

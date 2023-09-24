@@ -15,7 +15,9 @@ func NewAction(actionPool *pond.WorkerPool) *Action {
 }
 
 func (a *Action) Click(x, y int, double bool) {
-	robotgo.MoveClick(x, y, "left", double)
+	a.actionPool.Submit(func() {
+		robotgo.MoveClick(x, y, "left", double)
+	})
 }
 
 func (a *Action) Move(x, y int) {
@@ -25,13 +27,16 @@ func (a *Action) Move(x, y int) {
 }
 
 func (a *Action) KeyPress(key string) {
-	//c pond ошибка, пока так оставил
-	err := robotgo.KeyPress(key)
-	if err != nil {
-		fmt.Print("Key press err")
-	}
+	a.actionPool.Submit(func() {
+		err := robotgo.KeyPress(key)
+		if err != nil {
+			fmt.Print("Key press err")
+		}
+	})
 }
 
 func (a *Action) TypeStr(text string) {
-	robotgo.TypeStr(text, 0, 300)
+	a.actionPool.Submit(func() {
+		robotgo.TypeStr(text, 0, 300)
+	})
 }

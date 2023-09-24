@@ -18,7 +18,7 @@ func NewTask(action *internal.Action) *Task {
 
 func (d *Task) Exec(ctx context.Context, opts internal.TaskOpts) error {
 	manager := internal.NewTaskManager(d.Init())
-	err := manager.Run(ctx, internal.RunOptLoop)
+	err := manager.Run(ctx, internal.RunOptLoop, 10)
 	if err != nil {
 		return fmt.Errorf("manager run err: %w", err)
 	}
@@ -27,8 +27,8 @@ func (d *Task) Exec(ctx context.Context, opts internal.TaskOpts) error {
 
 func (d *Task) Init() []internal.TaskWithOpts {
 	//startl2 := internal.TaskWithOpts{
-	//	Task: login.NewLoginTask(d.action),
-	//	Opts: internal.TaskOpts{Name: "l2 login", DelayAfter: 10000, RunOnce: true},
+	//	Task: login.NewTask(d.action),
+	//	Opts: internal.TaskOpts{Name: "l2 login", DelayAfter: 15000, RunOnce: true},
 	//}
 	//
 	////Sit/Stand в игре нужно назначить на f10
@@ -36,19 +36,22 @@ func (d *Task) Init() []internal.TaskWithOpts {
 	//	Task: overall.NewActionTask(func() {
 	//		d.action.KeyPress("f10")
 	//	}),
-	//	Opts: internal.TaskOpts{Name: "l2 login", DelayAfter: 1000, RunOnce: true},
+	//	Opts: internal.TaskOpts{Name: "after login", DelayAfter: 1000, RunOnce: true},
 	//}
 
 	startManor := internal.TaskWithOpts{
 		Task: overall.NewActionTask(func() {
 			d.action.KeyPress("f1")
 		}),
-		Opts: internal.TaskOpts{Name: "manor start", DelayAfter: 100},
+		Opts: internal.TaskOpts{Name: "manor start", DelayAfter: 100, DelayBefore: 100},
 	}
 	ManorTaskOpts := overall.FindAndActionTaskOpts{
 		Screen:      nil,
 		PointOffset: image.Point{X: 10, Y: 2},
 		Attempts:    15,
+		WithSave:    true,
+		SavedH:      150,
+		SavedW:      100,
 	}
 
 	ManorTaskOpts.ActionFunc = func(x, y int) {
@@ -68,6 +71,9 @@ func (d *Task) Init() []internal.TaskWithOpts {
 	SelectSeedTaskOpts := overall.FindAndActionTaskOpts{
 		PointOffset: image.Point{X: 20, Y: 22},
 		Attempts:    10,
+		WithSave:    true,
+		SavedW:      200,
+		SavedH:      100,
 	}
 	SelectSeedTaskOpts.ActionFunc = func(x, y int) {
 		d.action.Click(x+SelectSeedTaskOpts.PointOffset.X, y+SelectSeedTaskOpts.PointOffset.Y, true)

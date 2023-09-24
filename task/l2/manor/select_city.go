@@ -4,6 +4,7 @@ import (
 	"clicker_bot/internal"
 	"context"
 	"fmt"
+	"image"
 	"strconv"
 	"time"
 )
@@ -15,6 +16,7 @@ type SelectCityTask struct {
 	Attempts      int
 	SeedNumber    int
 	CityNumber    int
+	savedPoint    *image.Point
 }
 
 func NewSelectCityTask(imgToFindPath string, screen *internal.Screen, action *internal.Action, seedNumber, cityNumber, attempts int) *SelectCityTask {
@@ -47,21 +49,36 @@ func (f *SelectCityTask) Exec(ctx context.Context, opts internal.TaskOpts) error
 
 		time.Sleep(opts.DelayBefore * time.Millisecond)
 
-		//находим меню выбора города
-		point, err := f.Screen.FindOnScreen(f.imgToFindPath)
-		if err != nil {
-			return fmt.Errorf("find img err:%w", err)
-		}
-		if point == nil {
-			continue
+		var clickPoint image.Point
+		if f.savedPoint == nil {
+			point, err := f.Screen.FindOnScreen(f.imgToFindPath)
+			if err != nil {
+				return fmt.Errorf("find img err:%w", err)
+			}
+			if point == nil {
+				continue
+			}
+			f.savedPoint = point
+			clickPoint = *point
+		} else {
+			f.Screen.SaveScreen("\\static\\screens\\tmp2.png", f.savedPoint.X-20, f.savedPoint.Y-10, 170, 100)
+			checkPoint, err := f.Screen.FindOnScreen(f.imgToFindPath, f.savedPoint.X-20, f.savedPoint.Y-10, 170, 100)
+			if err != nil {
+				return fmt.Errorf("find img err:%w", err)
+			}
+			if checkPoint == nil {
+				continue
+			}
+			clickPoint.X = f.savedPoint.X - 20 + checkPoint.X
+			clickPoint.Y = f.savedPoint.Y - 10 + checkPoint.Y
 		}
 
 		// вводим количество семян для сдачи
 		f.action.KeyPress(strconv.Itoa(f.SeedNumber))
 		//Выбираем город
-		f.action.Click(point.X+20, point.Y+5, false)
+		f.action.Click(clickPoint.X+20, clickPoint.Y+5, false)
 		time.Sleep(200 * time.Millisecond)
-		f.action.Click(point.X+20, point.Y+15*f.CityNumber, false)
+		f.action.Click(clickPoint.X+20, clickPoint.Y+15*f.CityNumber, false)
 
 		time.Sleep(opts.DelayAfter * time.Millisecond)
 		return nil
