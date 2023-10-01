@@ -14,8 +14,6 @@ import (
 // Соответсвие при поиске изображения
 const ImgSearchRate = 0.9
 
-const TesseractPath = "F:\\soft\\tesseract\\tesseract.exe"
-
 type Screen struct {
 }
 
@@ -73,7 +71,8 @@ func (s *Screen) FindText(imgPath string) (string, error) {
 		return "", fmt.Errorf("can't get root directory path")
 	}
 
-	cmd := exec.Command(TesseractPath, rootPath+imgPath, "-", "-l", "rus+eng")
+	tesseratPath := os.Getenv("TESSERACT_PATH")
+	cmd := exec.Command(tesseratPath, rootPath+imgPath, "-", "-l", "rus+eng")
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb

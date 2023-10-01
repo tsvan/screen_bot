@@ -61,7 +61,6 @@ func (f *SelectCityTask) Exec(ctx context.Context, opts internal.TaskOpts) error
 			f.savedPoint = point
 			clickPoint = *point
 		} else {
-			f.Screen.SaveScreen("\\static\\screens\\tmp2.png", f.savedPoint.X-20, f.savedPoint.Y-10, 170, 100)
 			checkPoint, err := f.Screen.FindOnScreen(f.imgToFindPath, f.savedPoint.X-20, f.savedPoint.Y-10, 170, 100)
 			if err != nil {
 				return fmt.Errorf("find img err:%w", err)

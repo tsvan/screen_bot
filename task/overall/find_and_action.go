@@ -16,11 +16,12 @@ type FindAndActionTask struct {
 }
 
 type FindAndActionTaskOpts struct {
-	Screen         *internal.Screen
-	ActionFunc     func(x, y int)
-	PointOffset    image.Point
-	Attempts       int
-	WithSave       bool
+	Screen      *internal.Screen
+	ActionFunc  func(x, y int)
+	PointOffset image.Point
+	Attempts    int
+	WithSave    bool
+	// Смещение для сохранения обсласти статичного изображения
 	SavedW, SavedH int
 }
 
@@ -58,6 +59,7 @@ func (f *FindAndActionTask) Exec(ctx context.Context, opts internal.TaskOpts) er
 			}
 			f.savedPoint = point
 		} else {
+			// тут просто проверяем что изображение есть на экране, а координаты берём из savedPoint
 			checkPoint, err := f.Opts.Screen.FindOnScreen(f.imgToFindPath, f.savedPoint.X-10, f.savedPoint.Y-10, f.Opts.SavedW, f.Opts.SavedH)
 			if err != nil {
 				return fmt.Errorf("find img err:%w", err)

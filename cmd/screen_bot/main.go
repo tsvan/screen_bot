@@ -6,10 +6,17 @@ import (
 	"context"
 	"fmt"
 	"github.com/alitto/pond"
+	"github.com/joho/godotenv"
 	hook "github.com/robotn/gohook"
+	"log"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
 

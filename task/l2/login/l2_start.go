@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/shirou/gopsutil/v3/process"
+	"os"
 	"os/exec"
 )
 
@@ -21,7 +22,8 @@ func (d *L2StartTask) Exec(_ context.Context, opts internal.TaskOpts) error {
 		return fmt.Errorf("can't kill fpid: %w", err)
 	}
 
-	cmd := exec.Command("F:\\games\\asterios\\Asterios.exe", "/autoplay")
+	gamePath := os.Getenv("L2_GAME_PATH")
+	cmd := exec.Command(gamePath, "/autoplay")
 	err = cmd.Start()
 	if err != nil {
 		return fmt.Errorf("l2 start failed: %w", err)

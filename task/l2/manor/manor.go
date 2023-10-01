@@ -2,6 +2,7 @@ package manor
 
 import (
 	"clicker_bot/internal"
+	"clicker_bot/task/l2/login"
 	"clicker_bot/task/overall"
 	"context"
 	"fmt"
@@ -26,18 +27,18 @@ func (d *Task) Exec(ctx context.Context, opts internal.TaskOpts) error {
 }
 
 func (d *Task) Init() []internal.TaskWithOpts {
-	//startl2 := internal.TaskWithOpts{
-	//	Task: login.NewTask(d.action),
-	//	Opts: internal.TaskOpts{Name: "l2 login", DelayAfter: 15000, RunOnce: true},
-	//}
-	//
-	////Sit/Stand в игре нужно назначить на f10
-	//afterLogin:= internal.TaskWithOpts{
-	//	Task: overall.NewActionTask(func() {
-	//		d.action.KeyPress("f10")
-	//	}),
-	//	Opts: internal.TaskOpts{Name: "after login", DelayAfter: 1000, RunOnce: true},
-	//}
+	_ = internal.TaskWithOpts{
+		Task: login.NewTask(d.action),
+		Opts: internal.TaskOpts{Name: "l2 login", DelayAfter: 15000, RunOnce: true},
+	}
+
+	//Sit/Stand в игре нужно назначить на f10
+	_ = internal.TaskWithOpts{
+		Task: overall.NewActionTask(func() {
+			d.action.KeyPress("f10")
+		}),
+		Opts: internal.TaskOpts{Name: "after login", DelayBefore: 21000, RunOnce: true},
+	}
 
 	startManor := internal.TaskWithOpts{
 		Task: overall.NewActionTask(func() {
@@ -46,7 +47,6 @@ func (d *Task) Init() []internal.TaskWithOpts {
 		Opts: internal.TaskOpts{Name: "manor start", DelayAfter: 100, DelayBefore: 100},
 	}
 	ManorTaskOpts := overall.FindAndActionTaskOpts{
-		Screen:      nil,
 		PointOffset: image.Point{X: 10, Y: 2},
 		Attempts:    15,
 		WithSave:    true,
@@ -81,7 +81,7 @@ func (d *Task) Init() []internal.TaskWithOpts {
 
 	selectSeed := internal.TaskWithOpts{
 		Task: overall.NewFindAndActionTask("\\static\\l2\\seed.PNG", SelectSeedTaskOpts),
-		Opts: internal.TaskOpts{Name: "select seed type", DelayBefore: 100},
+		Opts: internal.TaskOpts{Name: "select seed type", DelayBefore: 200},
 	}
 
 	citySelect := internal.TaskWithOpts{
