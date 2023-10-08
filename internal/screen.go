@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/go-vgo/robotgo"
 	"github.com/vcaesar/gcv"
+	"gocv.io/x/gocv"
 	"image"
-	"image/jpeg"
 	"os"
 	"os/exec"
 )
@@ -72,7 +72,7 @@ func (s *Screen) FindText(imgPath string) (string, error) {
 	}
 
 	tesseratPath := os.Getenv("TESSERACT_PATH")
-	cmd := exec.Command(tesseratPath, rootPath+imgPath, "-", "-l", "rus+eng")
+	cmd := exec.Command(tesseratPath, rootPath+imgPath, "-", "-l", "rus+eng", "-c", "tessedit_char_whitelist=+?0123456789")
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
@@ -92,18 +92,40 @@ func (s *Screen) SaveScreen(path string, opt ...int) error {
 		return fmt.Errorf("can't get root directory path")
 	}
 
-	f, err := os.Create(rootPath + path)
+	matGray := gocv.NewMat()
+	matImg, err := gocv.ImageToMatRGB(screen)
 	if err != nil {
-		return fmt.Errorf("can't create tmp image: %w", err)
+		return fmt.Errorf("can't convert screen to gocv Mat: %w", err)
 	}
+	//gocv.AdaptiveThreshold( matImg,&matGray, 255.0, gocv.AdaptiveThresholdGaussian, gocv.ThresholdBinary, 5, 4.0)
 
-	if err = jpeg.Encode(f, screen, nil); err != nil {
-		return fmt.Errorf("failed to encode img: %w", err)
-	}
+	gocv.CvtColor(matImg, &matGray, gocv.ColorRGBToGray)
+	gocv.IMWrite(rootPath+path, matGray)
 
-	if err = f.Close(); err != nil {
-		return fmt.Errorf("can't close tmp image: %w", err)
-	}
+	//grayScreen := image.NewGray(screen.Bounds())
+	//draw.Draw(grayScreen, grayScreen.Bounds(), screen, screen.Bounds().Min, draw.Src)
+	//f, err := os.Create(rootPath + path)
+	//if err != nil {
+	//	return fmt.Errorf("can't create tmp image: %w", err)
+	//}
+	//
+	//if err = jpeg.Encode(f, grayScreen, &jpeg.Options{Quality: 100 }); err != nil {
+	//	return fmt.Errorf("failed to encode img: %w", err)
+	//}
+	//
+	//if err = f.Close(); err != nil {
+	//	return fmt.Errorf("can't close tmp image: %w", err)
+	//}
 
 	return nil
 }
+
+//matGray := gocv.NewMat()
+//matImg, err := gocv.ImageGrayToMatGray(grayScreen)
+//if err != nil {
+//return fmt.Errorf("can't convert screen to gocv Mat: %w", err)
+//}
+//gocv.AdaptiveThreshold( matImg,&matGray, 255.0, gocv.AdaptiveThresholdGaussian, gocv.ThresholdBinary, 5, 4.0)
+//
+////gocv.CvtColor(matImg, &matGray, gocv.ColorRGBToGray)
+//gocv.IMWrite(rootPath + path, matGray)

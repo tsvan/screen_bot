@@ -45,6 +45,11 @@ func (s *TaskManager) Run(ctx context.Context, runOpt RunOpt, reRunAttempts int)
 func (s *TaskManager) runSequence(ctx context.Context) error {
 START:
 	for _, v := range s.tasks {
+
+		if v.Opts.RunType == Disabled {
+			continue
+		}
+
 		time.Sleep(v.Opts.DelayBefore * time.Millisecond)
 		err := v.Task.Exec(ctx, v.Opts)
 		if err != nil {
@@ -99,12 +104,17 @@ func (s *TaskManager) runLoop(ctx context.Context, reRunAttempts int) error {
 	START:
 		// для полного перезапуска, например если игра не отвечает
 		if failRunsCount > reRunAttempts {
-			fmt.Println("rerun attempts")
 			firstTime = true
 		}
 
 		for _, v := range s.tasks {
-			if v.Opts.RunOnce && !firstTime {
+			// пропускаем таски
+			if v.Opts.RunType == Disabled {
+				continue
+			}
+
+			// запускаем один раз, либо полный перезапуск по goto
+			if v.Opts.RunType == RunOnce && !firstTime {
 				continue
 			}
 			firstTime = false

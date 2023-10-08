@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-type Status string
+type RunType int
 
 const (
-	Complete   Status = "Complete"
-	InProgress Status = "InProgress"
-	Failed     Status = "Failed"
+	Default  RunType = 0
+	RunOnce  RunType = 1
+	Disabled RunType = 2
 )
 
 type TaskErrCode int
@@ -25,7 +25,7 @@ type TaskOpts struct {
 	Name        string
 	DelayBefore time.Duration
 	DelayAfter  time.Duration
-	RunOnce     bool
+	RunType     RunType
 }
 
 type TaskWithOpts struct {

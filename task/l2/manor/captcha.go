@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const TmpImgPath = "\\static\\screens\\tmp.png"
+const TmpImgPath = "\\static\\screens\\tmp.jpeg"
 
 type CaptchaTask struct {
 	imgToFindPath string
@@ -69,7 +69,7 @@ func (f *CaptchaTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 		}
 
 		//сохраняем скрин с капчей
-		err := f.Screen.SaveScreen(TmpImgPath, clickPoint.X, clickPoint.Y-50, 100, 50)
+		err := f.Screen.SaveScreen(TmpImgPath, clickPoint.X, clickPoint.Y-50, 70, 50)
 		if err != nil {
 			return fmt.Errorf("can't save captcha:%w", err)
 		}
@@ -77,6 +77,10 @@ func (f *CaptchaTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 		text, err := f.Screen.FindText(TmpImgPath)
 		captchaRes, err := f.decodeCaptcha(text)
 		if err != nil {
+			//err = f.Screen.SaveScreen(fmt.Sprintf("\\static\\screens\\test\\%d.jpeg",time.Now().Unix()), clickPoint.X, clickPoint.Y-50, 70, 50)
+			//if err != nil {
+			//	fmt.Println(err)
+			//}
 			return &internal.TaskErr{StatusCode: internal.InvalidCaptcha, Err: err}
 		}
 		strRes := strconv.Itoa(captchaRes)
