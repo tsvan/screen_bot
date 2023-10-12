@@ -38,7 +38,7 @@ func TestSliceIntersect(t *testing.T) {
 		},
 		{
 			name:     "2",
-			imgPath:  "\\static\\screens\\test11.png",
+			imgPath:  "\\static\\screens\\test\\1696777110.jpeg",
 			expected: "350 +8?\r\n",
 		},
 	}

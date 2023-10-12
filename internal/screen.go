@@ -6,7 +6,9 @@ import (
 	"github.com/go-vgo/robotgo"
 	"github.com/vcaesar/gcv"
 	"gocv.io/x/gocv"
+	"golang.org/x/image/draw"
 	"image"
+	"image/color"
 	"os"
 	"os/exec"
 )
@@ -63,6 +65,62 @@ func (s *Screen) FindOnScreen(path string, opt ...int) (*image.Point, error) {
 		return nil, nil
 	}
 	return &point, nil
+}
+
+func (s *Screen) FindColorCount(color color.RGBA, opt ...int) int {
+	img := s.CaptureScreen(opt...)
+	count := 0
+	for y := 0; y < img.Bounds().Max.Y; y++ {
+		for x := 0; x < img.Bounds().Max.X; x++ {
+			imgColor := img.At(x, y)
+			if imgColor == color {
+				count++
+			}
+			//fmt.Printf("%v", color)
+		}
+	}
+	return count
+}
+
+func (s *Screen) FindColorBounds(color color.RGBA) (int, image.Point, image.Point) {
+	img := s.CaptureScreen()
+	count := 0
+	min := image.Point{}
+	max := image.Point{}
+	for y := 0; y < img.Bounds().Max.Y; y++ {
+		for x := 0; x < img.Bounds().Max.X; x++ {
+			imgColor := img.At(x, y)
+			if imgColor == color {
+				if count == 0 {
+					min = image.Point{X: x, Y: y}
+				}
+				count++
+				max = image.Point{X: x, Y: y}
+			}
+		}
+	}
+	return count, min, max
+}
+
+func image_2_array_pix(src image.Image) [][][3]float32 {
+	bounds := src.Bounds()
+	width, height := bounds.Max.X, bounds.Max.Y
+	iaa := make([][][3]float32, height)
+	src_rgba := image.NewRGBA(src.Bounds())
+	draw.Copy(src_rgba, image.Point{}, src, src.Bounds(), draw.Src, nil)
+
+	for y := 0; y < height; y++ {
+		row := make([][3]float32, width)
+		for x := 0; x < width; x++ {
+			idx_s := (y*width + x) * 4
+			pix := src_rgba.Pix[idx_s : idx_s+4]
+			fmt.Println(pix)
+			row[x] = [3]float32{float32(pix[0]), float32(pix[1]), float32(pix[2])}
+		}
+		iaa[y] = row
+	}
+	fmt.Println("ok")
+	return iaa
 }
 
 func (s *Screen) FindText(imgPath string) (string, error) {
