@@ -76,7 +76,8 @@ func (f *SelectCityTask) Exec(ctx context.Context, opts internal.TaskOpts) error
 		f.action.KeyPress(strconv.Itoa(f.SeedNumber))
 		//Выбираем город
 		f.action.Click(clickPoint.X+20, clickPoint.Y+5, false)
-		time.Sleep(200 * time.Millisecond)
+		// ждём появления выпадающего меню
+		time.Sleep(DefaultDelay * time.Millisecond)
 		f.action.Click(clickPoint.X+20, clickPoint.Y+30+15*f.CityNumber, false)
 
 		time.Sleep(opts.DelayAfter * time.Millisecond)

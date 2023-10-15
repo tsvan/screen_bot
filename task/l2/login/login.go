@@ -46,20 +46,20 @@ func (d *Task) Init() []internal.TaskWithOpts {
 	}
 
 	l2Login1 := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("\\static\\l2\\login.PNG", loginTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\login\\login.PNG", loginTaskOpts),
 		Opts: internal.TaskOpts{Name: "l2 login first screen", DelayBefore: 1000},
 	}
 	l2Login2 := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("\\static\\l2\\accept.PNG", loginTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\login\\accept.PNG", loginTaskOpts),
 		Opts: internal.TaskOpts{Name: "l2 login second screen", DelayBefore: 1000},
 	}
 
 	l2Login3 := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("\\static\\l2\\enter.PNG", loginTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\login\\enter.PNG", loginTaskOpts),
 		Opts: internal.TaskOpts{Name: "l2 login third screen", DelayBefore: 1000},
 	}
 	l2Login4 := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("\\static\\l2\\start.PNG", loginTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\login\\start.PNG", loginTaskOpts),
 		Opts: internal.TaskOpts{Name: "l2 login fourth screen", DelayBefore: 1000},
 	}
 

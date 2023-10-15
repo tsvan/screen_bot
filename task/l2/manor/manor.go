@@ -60,12 +60,12 @@ func (d *Task) Init() []internal.TaskWithOpts {
 	}
 
 	handOverManor := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("\\static\\l2\\handover_manor.PNG", ManorTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\manor\\handover_manor.PNG", ManorTaskOpts),
 		Opts: internal.TaskOpts{Name: "hand over manor", DelayBefore: DefaultDelay},
 	}
 
 	captcha := internal.TaskWithOpts{
-		Task: NewCaptchaTaskTask("\\static\\l2\\check_manor.PNG", nil, d.action, DefaultAttempts),
+		Task: NewCaptchaTaskTask("\\static\\l2\\manor\\check_manor.PNG", nil, d.action, DefaultAttempts),
 		Opts: internal.TaskOpts{Name: "manor captcha", DelayBefore: DefaultDelay},
 	}
 
@@ -75,23 +75,23 @@ func (d *Task) Init() []internal.TaskWithOpts {
 	}
 
 	selectSeed := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("\\static\\l2\\seed.PNG", SelectSeedTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\manor\\seed.PNG", SelectSeedTaskOpts),
 		Opts: internal.TaskOpts{Name: "select seed type", DelayBefore: DefaultDelay},
 	}
 
 	citySelect := internal.TaskWithOpts{
-		Task: NewSelectCityTask("\\static\\l2\\select_city.PNG", nil, d.action, d.GetSeedNumber(), d.GetCityNumber(), DefaultAttempts),
+		Task: NewSelectCityTask("\\static\\l2\\manor\\select_city.PNG", nil, d.action, d.GetSeedNumber(), d.GetCityNumber(), DefaultAttempts),
 		Opts: internal.TaskOpts{Name: "select city and seed count", DelayBefore: DefaultDelay},
 	}
 
 	ManorTaskOpts.PointOffset = image.Point{X: 10, Y: 2}
 	confirmSeeds := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("\\static\\l2\\confirm_seed.PNG", ManorTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\manor\\confirm_seed.PNG", ManorTaskOpts),
 		Opts: internal.TaskOpts{Name: "confirm seed count and city", DelayBefore: DefaultDelay},
 	}
 
 	sellSeeds := internal.TaskWithOpts{
-		Task: overall.NewFindAndActionTask("\\static\\l2\\sell_seed.PNG", ManorTaskOpts),
+		Task: overall.NewFindAndActionTask("\\static\\l2\\manor\\sell_seed.PNG", ManorTaskOpts),
 		Opts: internal.TaskOpts{Name: "sell seeds", DelayBefore: DefaultDelay},
 	}
 

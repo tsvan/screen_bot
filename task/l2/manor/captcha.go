@@ -77,10 +77,6 @@ func (f *CaptchaTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 		text, err := f.Screen.FindText(TmpImgPath)
 		captchaRes, err := f.decodeCaptcha(text)
 		if err != nil {
-			//err = f.Screen.SaveScreen(fmt.Sprintf("\\static\\screens\\test\\%d.jpeg",time.Now().Unix()), clickPoint.X, clickPoint.Y-50, 70, 50)
-			//if err != nil {
-			//	fmt.Println(err)
-			//}
 			return &internal.TaskErr{StatusCode: internal.InvalidCaptcha, Err: err}
 		}
 		strRes := strconv.Itoa(captchaRes)
@@ -89,7 +85,6 @@ func (f *CaptchaTask) Exec(ctx context.Context, opts internal.TaskOpts) error {
 		}
 
 		//после ввода капчи жмём подтверждение
-		time.Sleep(100 * time.Microsecond)
 		f.action.Click(clickPoint.X+10, clickPoint.Y+10, false)
 
 		time.Sleep(opts.DelayAfter * time.Millisecond)
