@@ -2,7 +2,9 @@ package main
 
 import (
 	"clicker_bot/internal"
+	base_task "clicker_bot/task"
 	"clicker_bot/task/l2/farm"
+	"clicker_bot/task/l2/manor"
 	_ "clicker_bot/task/l2/manor"
 	"context"
 	"fmt"
@@ -10,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	hook "github.com/robotn/gohook"
 	"log"
+	"os"
 )
 
 func main() {
@@ -24,7 +27,8 @@ func main() {
 	var exit = make(chan bool)
 	pool := pond.New(1, 10)
 	actionPool := internal.NewAction(pool)
-	task := farm.NewTask(actionPool)
+	task := selectTask(actionPool)
+
 	startBot(ctx, task)
 
 	go closeHandler(exit, "q")
@@ -32,6 +36,19 @@ func main() {
 	go func() {
 		<-ctx.Done()
 	}()
+}
+
+func selectTask(actionPool *internal.Action) internal.Task {
+	task := os.Getenv("TASK_TYPE")
+	switch task {
+	case "farm":
+		return farm.NewTask(actionPool)
+	case "manor":
+		return manor.NewTask(actionPool)
+	default:
+		return base_task.NewDummyTask()
+
+	}
 }
 
 func startBot(ctx context.Context, script internal.Task) {

@@ -7,6 +7,8 @@ import (
 	"context"
 	"fmt"
 	"image"
+	"os"
+	"strconv"
 )
 
 const (
@@ -78,7 +80,7 @@ func (d *Task) Init() []internal.TaskWithOpts {
 	}
 
 	citySelect := internal.TaskWithOpts{
-		Task: NewSelectCityTask("\\static\\l2\\select_city.PNG", nil, d.action, 1, 3, DefaultAttempts),
+		Task: NewSelectCityTask("\\static\\l2\\select_city.PNG", nil, d.action, d.GetSeedNumber(), d.GetCityNumber(), DefaultAttempts),
 		Opts: internal.TaskOpts{Name: "select city and seed count", DelayBefore: DefaultDelay},
 	}
 
@@ -94,4 +96,20 @@ func (d *Task) Init() []internal.TaskWithOpts {
 	}
 
 	return []internal.TaskWithOpts{l2Login, l2Sit, startManor, handOverManor, captcha, selectSeed, citySelect, confirmSeeds, sellSeeds}
+}
+
+func (d *Task) GetSeedNumber() int {
+	seedNumber, err := strconv.Atoi(os.Getenv("MANOR_SEED_NUMBER"))
+	if err != nil {
+		panic("can't parse seed number")
+	}
+	return seedNumber
+}
+
+func (d *Task) GetCityNumber() int {
+	cityNumber, err := strconv.Atoi(os.Getenv("MANOR_CITY_NUMBER"))
+	if err != nil {
+		panic("can't parse city number")
+	}
+	return cityNumber
 }
