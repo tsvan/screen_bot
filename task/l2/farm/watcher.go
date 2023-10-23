@@ -23,22 +23,17 @@ func NewWatcher() *Watcher {
 	return &Watcher{}
 }
 
-func (w *Watcher) WatchScreen() {
+func (w *Watcher) WatchScreen() error {
 	w.GameInfo.Character.Hp = w.CharacterBar(color.RGBA{R: 121, G: 28, B: 17, A: 255})
 	w.GameInfo.Enemy.Hp = w.MobBar(color.RGBA{R: 111, G: 23, B: 20, A: 255})
-	if w.savedMobHpBar != nil {
-		defeatedMobHp := w.Screen.FindColorCount(color.RGBA{R: 47, G: 26, B: 23, A: 255},
-			w.savedMobHpBar.Min.X-2,
-			w.savedMobHpBar.Min.Y-1,
-			w.savedMobHpBar.Min.X+4,
-			w.savedMobHpBar.Min.Y+2,
-		)
-		if defeatedMobHp > 0 {
-			w.GameInfo.Enemy.WasDefeated = true
-		} else {
-			w.GameInfo.Enemy.WasDefeated = false
-		}
+
+	var err error
+	w.GameInfo.Character.HaveTarget, err = w.targetBar()
+	if err != nil {
+		return err
 	}
+
+	return nil
 }
 
 func (w *Watcher) GetWindowInfo() l2.GameInfo {
@@ -57,12 +52,12 @@ func (w *Watcher) FindSize() error {
 func (w *Watcher) findWindowSize() (*image.Point, *image.Point, error) {
 	beginPoint, err := w.Screen.FindOnScreen("\\static\\l2\\farm\\begin_window.png")
 	if err != nil {
-		return nil, nil, fmt.Errorf("can't find start window size:%w", err)
+		return nil, nil, fmt.Errorf("can't find start window size start:%w", err)
 	}
 
 	endPoint, err := w.Screen.FindOnScreen("\\static\\l2\\farm\\end_window.png")
 	if err != nil {
-		return nil, nil, fmt.Errorf("can't find end window size:%w", err)
+		return nil, nil, fmt.Errorf("can't find end window size end:%w", err)
 	}
 
 	return beginPoint, endPoint, nil
@@ -114,4 +109,23 @@ func (w *Watcher) MobBar(color color.RGBA) float64 {
 		return (float64(hp) / float64(w.maxMobHpCount)) * 100
 	}
 	return 0
+}
+
+func (w *Watcher) targetBar() (bool, error) {
+	target, err := w.Screen.FindOnScreen("\\static\\l2\\farm\\target.png",
+		w.GameInfo.GameWindow.X,
+		w.GameInfo.GameWindow.Y,
+		w.GameInfo.GameWindow.W,
+		w.GameInfo.GameWindow.H,
+	)
+	if err != nil {
+		return false, fmt.Errorf("can't find target:%w", err)
+	}
+
+	if target == nil {
+		return false, nil
+	} else {
+		return true, nil
+
+	}
 }

@@ -2,6 +2,7 @@ package farm
 
 import (
 	"clicker_bot/internal"
+	"clicker_bot/task/l2"
 	"context"
 	"fmt"
 	"time"
@@ -40,34 +41,78 @@ func (d *Task) Start(ctx context.Context, watcher *Watcher) error {
 		default:
 
 		}
-		watcher.WatchScreen()
+
+		err = watcher.WatchScreen()
+		if err != nil {
+			fmt.Println(err)
+		}
 		d.Action(watcher)
 		//fmt.Println(robotgo.GetMouseColor())
-		time.Sleep(100 * time.Millisecond)
+		fmt.Println(watcher.GameInfo.Enemy)
+		time.Sleep(200 * time.Millisecond)
 	}
 }
 
 func (d *Task) Action(watcher *Watcher) {
 	info := watcher.GetWindowInfo()
 
+	d.Attack(info)
+	d.Heal(info, 50, "f5")
+	d.AfterMobDefeat(info)
+	d.NextTarget(info)
+}
+
+func (d *Task) Attack(info l2.GameInfo) {
 	if info.Enemy.Hp == 100 {
-		fmt.Println("attack")
+		//fmt.Println("attack")
+		d.action.KeyPress("f6")
+		d.action.KeyPress("f1")
+		return
+	}
+	if info.Enemy.Hp > 0 {
 		d.action.KeyPress("f1")
 	}
+}
 
-	if info.Character.Hp <= 60 {
-		fmt.Println("heal")
+func (d *Task) Heal(info l2.GameInfo, hpVal float64, button string) {
+	if info.Character.Hp <= hpVal {
+		//fmt.Println("heal")
+		d.action.KeyPress(button)
 	}
+}
 
-	if info.Enemy.Hp == 0 && info.Enemy.WasDefeated {
-		fmt.Println("pickup")
+func (d *Task) AfterMobDefeat(info l2.GameInfo) {
+	if info.Character.HaveTarget && info.Enemy.Hp == 0 {
+		//fmt.Println("pickup")
 		d.action.KeyPress("f4")
-	}
+		time.Sleep(200 * time.Millisecond)
+		d.action.KeyPress("f4")
+		time.Sleep(200 * time.Millisecond)
+		d.action.KeyPress("f4")
+		time.Sleep(200 * time.Millisecond)
+		d.action.KeyPress("f4")
+		time.Sleep(200 * time.Millisecond)
+		d.action.KeyPress("f4")
+		time.Sleep(200 * time.Millisecond)
+		d.action.KeyPress("f4")
+		time.Sleep(200 * time.Millisecond)
+		d.action.KeyPress("f4")
+		time.Sleep(200 * time.Millisecond)
 
-	if info.Enemy.Hp == 0 && !info.Enemy.WasDefeated && info.Character.Hp > 60 {
+		//собрать манор
+		d.action.KeyPress("f7")
+		time.Sleep(100 * time.Millisecond)
+
+		d.action.KeyPress("esc")
+		time.Sleep(100 * time.Millisecond)
+
+	}
+}
+
+func (d *Task) NextTarget(info l2.GameInfo) {
+	if info.Enemy.Hp == 0 && !info.Character.HaveTarget && info.Character.Hp > 50 {
 		// next target
-		fmt.Println("next target")
+		//fmt.Println("next target")
 		d.action.KeyPress("f2")
 	}
-	fmt.Println(info)
 }

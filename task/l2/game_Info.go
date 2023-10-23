@@ -9,20 +9,19 @@ const (
 )
 
 type GameInfo struct {
-	GameWindow      WindowSize
-	Character       Character
-	Enemy           Enemy
-	isEnemyOnTarget bool
+	GameWindow WindowSize
+	Character  Character
+	Enemy      Enemy
 }
 
 type Character struct {
-	Hp float64
-	Mp int
+	Hp         float64
+	Mp         int
+	HaveTarget bool
 }
 
 type Enemy struct {
-	Hp          float64
-	WasDefeated bool
+	Hp float64
 }
 
 type WindowSize struct {
